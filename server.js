@@ -1,11 +1,13 @@
-// server.js
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
+const postRoutes = require('./routes/postRoutes');
+const {connectDB} = require("./db");
 
-dotenv.config(); // Load environment variables
+connectDB();
+dotenv.config();
 
 const app = express();
 const port = 3001;
@@ -28,12 +30,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(bodyParser.json()); // To parse JSON request bodies
-
-// Routes for user registration and login
+app.use(bodyParser.json());
 app.use('/api', userRoutes);
+// app.use('/api/files', postRoutes);
+app.use('/api/posts', postRoutes); 
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
