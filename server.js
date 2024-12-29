@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
-const connectDB = require("./db");
+const postRoutes = require('./routes/postRoutes');
+const {connectDB} = require("./db");
 
 connectDB();
 dotenv.config();
@@ -31,6 +32,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/api', userRoutes);
+// app.use('/api/files', postRoutes);
+app.use('/api/posts', postRoutes); 
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
