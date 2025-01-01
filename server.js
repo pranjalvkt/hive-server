@@ -32,7 +32,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/api', userRoutes);
-// app.use('/api/files', postRoutes);
 app.use('/api/posts', postRoutes); 
 
 app.listen(port, () => {
