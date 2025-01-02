@@ -21,6 +21,37 @@ const register = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  const { id } = req.params;
+  const { fullName } = req.body;
+
+  try {
+    const user = await User.findById(id).select("-password");;
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.fullName = fullName || user.fullName;
+
+    if (req.file) {
+      user.profilePic = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
+    }
+
+    const updatedUser = await user.save();
+    res.status(200).json({
+      message: 'Post updated successfully',
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -55,10 +86,27 @@ const getUser = async (req, res) => {
 
     res.status(200).json(user);
   } catch (err) {
-    // console.log(err);
-    
     res.status(500).json({ message: "Server error." });
   }
 };
 
-module.exports = { register, login, getUser };
+const getImageByUserId = async (req, res) => {
+  const { id } = req.params;  
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user || !user.profilePic) {
+      return res.status(404).json({ message: "Image not found" });
+    }
+
+    res.contentType(user.profilePic.contentType);
+    res.send(user.profilePic.data);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error retrieving image", error: err.message });
+  }
+};
+
+module.exports = { register, login, getUser, updateUser, getImageByUserId };
