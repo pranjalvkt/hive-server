@@ -31,7 +31,7 @@ const updateUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    
     user.fullName = fullName || user.fullName;
 
     if (req.file) {
@@ -95,8 +95,8 @@ const getImageByUserId = async (req, res) => {
 
   try {
     const user = await User.findById(id);
-
-    if (!user || !user.profilePic) {
+    
+    if (!user || !user.hasOwnProperty('profilePic')) {
       return res.status(404).json({ message: "Image not found" });
     }
 
