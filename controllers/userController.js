@@ -44,7 +44,7 @@ const updateUser = async (req, res) => {
     const updatedUser = await user.save();
     res.status(200).json({
       message: 'Post updated successfully',
-      user: updatedUser,
+      user: {user_id: updatedUser._id, user_email: updatedUser.email, user_name: updatedUser.fullName, profilePic: updatedUser.profilePic },
     });
   } catch (err) {
     console.error(err);
@@ -84,7 +84,7 @@ const getUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(user);
+    res.status(200).json({user_id: user._id, user_email: user.email, user_name: user.fullName, profilePic: user.profilePic });
   } catch (err) {
     res.status(500).json({ message: "Server error." });
   }
@@ -95,10 +95,6 @@ const getImageByUserId = async (req, res) => {
 
   try {
     const user = await User.findById(id);
-    
-    if (!user || !user.hasOwnProperty('profilePic')) {
-      return res.status(404).json({ message: "Image not found" });
-    }
 
     res.contentType(user.profilePic.contentType);
     res.send(user.profilePic.data);
