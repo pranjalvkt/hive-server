@@ -69,7 +69,10 @@ const getImageByPostId = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
+    const { id } = req.params;
+
+    const posts = await Post.find({ userId: id });
+
     res.status(200).json(posts);
   } catch (err) {
     console.error(err);
