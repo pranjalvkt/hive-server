@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
     data: Buffer, 
     contentType: String 
   },
+  connections: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 });
 
 module.exports = mongoose.model("User", UserSchema);

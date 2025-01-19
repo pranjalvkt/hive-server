@@ -1,0 +1,19 @@
+@startuml
+class Post {
+  + String title
+  + String description
+  + Buffer image_file.data
+  + String image_file.contentType
+  + ObjectId userId
+  + String userEmail
+  + String userName
+  + Date createdAt
+  + Date updatedAt
+}
+
+class User {
+  + ObjectId _id
+}
+
+Post --> User : "userId (refers to)"
+@enduml

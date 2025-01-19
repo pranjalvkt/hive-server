@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
+const connectionRoutes = require("./routes/connectionRoute");
 const {connectDB} = require("./db");
 
 connectDB();
@@ -33,6 +34,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use('/api', userRoutes);
 app.use('/api/posts', postRoutes); 
+app.use('/api/connections', connectionRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

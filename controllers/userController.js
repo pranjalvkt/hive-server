@@ -96,7 +96,6 @@ const login = async (req, res) => {
 
 const getUser = async (req, res) => {
   const { id } = req.params;
-  
 
   try {
     const user = await User.findById(id).select("-password");
@@ -112,6 +111,21 @@ const getUser = async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 };
+
+const getConnections = async (req, res) => {
+  const { id } = req.params;
+  
+    try {
+      const response = await User.findById(id, { connections: 1, _id: 0 })
+      .populate("connections", "fullName email profilePic")
+      const friendsList = response?.connections || []
+      logger.info(`All Users fetched successfully`);
+      res.status(200).json(friendsList);
+    } catch (error) {
+      logger.error(`Error fetching users`);
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+}
 
 const getImageByUserId = async (req, res) => {
   const { id } = req.params;
@@ -134,4 +148,4 @@ const getImageByUserId = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getUser, updateUser, getImageByUserId };
+module.exports = { register, login, getUser, updateUser, getImageByUserId, getConnections };
