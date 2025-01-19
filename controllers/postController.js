@@ -114,7 +114,7 @@ const updatePost = async (req, res) => {
 };
 
 const deletePost = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params;  
 
   try {
     const post = await Post.findById(id);
@@ -122,7 +122,7 @@ const deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    await post.remove();
+    await post.deleteOne();
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (err) {
     console.error(err);

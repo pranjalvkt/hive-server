@@ -1,0 +1,9 @@
+@startuml
+class User {
+  + String fullName
+  + String email
+  + String password
+  + Buffer profilePic.data
+  + String profilePic.contentType
+}
+@enduml
