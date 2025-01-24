@@ -22,9 +22,7 @@ const connectionSchema = new mongoose.Schema({
   },
 });
 
-// Add index to ensure the connection between user1 and user2 is unique
-connectionSchema.index({ user1: 1, user2: 1 }, { unique: true });
-connectionSchema.index({ user2: 1, user1: 1 }, { unique: true });
+connectionSchema.index({ sender: 1, receiver: 1 }, { unique: true });
 
 const Connection = mongoose.model('Connection', connectionSchema);
 

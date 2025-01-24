@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 const sendFriendRequest = async (req, res) => {
   const senderId = req.params?.id; // The logged-in user (sender)
   const { receiverId } = req.body; // The receiver who will receive the request
-
+  
   try {
     // Check if both users exist
     const sender = await User.findById(senderId);
@@ -33,10 +33,15 @@ const sendFriendRequest = async (req, res) => {
       status: "pending",
     });
 
-    await newConnection.save();
+    const connection = await newConnection.save();
+    const sendRequest = {
+      connectionId: connection._id,
+      receiver: receiver,
+      status: connection.status,
+    }
     return res
       .status(200)
-      .json({ message: "Friend request sent successfully." });
+      .json({ message: "Friend request sent successfully.", sendRequest: sendRequest });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -64,7 +69,14 @@ const acceptFriendRequest = async (req, res) => {
     connection.status = "accepted";
     await connection.save();
 
-    return res.status(200).json({ message: "Friend request accepted." });
+    const user = await User.findById(connection.sender);
+
+    const acceptedRequests = {
+      connectionId: connectionId,
+      user: user,
+    }
+
+    return res.status(200).json({ message: "Friend request accepted.", acceptedRequests: acceptedRequests });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -88,10 +100,14 @@ const rejectFriendRequest = async (req, res) => {
         .json({ message: "You are not the receiver of this request." });
     }
 
-    // Delete the connection if it's rejected
-    await connection.remove();
+    let removedUserId = connection.sender.toString();
 
-    return res.status(200).json({ message: "Friend request rejected." });
+    const removedUser = await User.findById(removedUserId);
+
+    // Delete the connection if it's rejected
+    await connection.deleteOne();
+
+    return res.status(200).json({ message: "Friend request rejected.", removedUser: removedUser });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -227,6 +243,94 @@ const fetchAvailableUsers = async (req, res) => {
   }
 };
 
+const getAcceptedConnections = async (req, res) => {
+  try {
+    const userId = req?.params?.id; // Assuming `req.user.id` contains the logged-in user's ID
+
+    // Fetch accepted connections where the user is either the sender or receiver
+    const acceptedConnections = await Connection.find({
+      status: 'accepted',
+      $or: [{ sender: userId }, { receiver: userId }],
+    })
+      .populate('sender', 'fullName email profilePic')
+      .populate('receiver', 'fullName email profilePic');
+
+    // Map to return only the other user's details
+    const connections = acceptedConnections.map((connection) => {
+      const otherUser =
+        connection.sender._id.toString() === userId
+          ? connection.receiver
+          : connection.sender;
+
+      return {
+        connectionId: connection._id,
+        user: {
+          _id: otherUser._id,
+          fullName: otherUser.fullName,
+          email: otherUser.email,
+          profilePic: otherUser.profilePic,
+        },
+      };
+    });
+
+    return res.status(200).json({
+      data: connections
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching accepted connections',
+      error: error.message,
+    });
+  }
+};
+
+const removeFriend = async (req, res) => {
+  const userId = req.params?.id; // The logged-in user's ID
+  const { connectionId } = req.body; // Connection ID to remove
+
+  try {
+    // Find the connection by its ID
+    const connection = await Connection.findById(connectionId);
+
+    // Check if the connection exists
+    if (!connection) {
+      return res.status(404).json({ message: "Connection not found." });
+    }
+
+    // Ensure the logged-in user is either the sender or receiver in the connection
+    if (
+      connection.sender.toString() !== userId &&
+      connection.receiver.toString() !== userId
+    ) {
+      return res.status(403).json({
+        message: "You are not authorized to remove this friend.",
+      });
+    }
+    
+    let removedUserId
+    if(connection.sender.toString() === userId) {
+      removedUserId = connection.receiver;
+    } else {
+      removedUserId = connection.sender;
+    }
+
+    const removedUser = await User.findById(removedUserId);
+
+    await connection.deleteOne();
+
+    return res
+      .status(200)
+      .json({ message: "Friend has been successfully removed.", removedUser: removedUser});
+  } catch (error) {
+    console.error("Error removing friend:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+module.exports = { removeFriend };
+
+
 module.exports = {
   sendFriendRequest,
   acceptFriendRequest,
@@ -235,4 +339,6 @@ module.exports = {
   fetchSentRequests,
   fetchAcceptedRequests,
   fetchAvailableUsers,
+  getAcceptedConnections,
+  removeFriend,
 };
