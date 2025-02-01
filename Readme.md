@@ -6,7 +6,7 @@ Hive is a social media platform's backend API, providing user authentication, pr
 
 1. Clone the repo:
     ```bash
-    git clone <repo-url>
+    git clone https://github.com/pranjalvkt/hive-server.git
     ```
 
 2. Install dependencies:
@@ -24,129 +24,28 @@ Hive is a social media platform's backend API, providing user authentication, pr
 ## API Endpoints
 
 ### **User Authentication:**
-
-1. **POST /api/register**: User registration.
-   - **Request body**:
-     ```json
-     {
-       "fullName": "John Doe",
-       "email": "johndoe@example.com",
-       "password": "password123"
-     }
-     ```
-   - **Response**: 
-     ```json
-     {
-       "message": "User registered successfully!"
-     }
-     ```
-
-2. **POST /api/login**: User login with JWT.
-   - **Request body**:
-     ```json
-     {
-       "email": "johndoe@example.com",
-       "password": "password123"
-     }
-     ```
-   - **Response**:
-     ```json
-     {
-       "token": "<JWT-TOKEN>",
-       "user_id": "<USER-ID>",
-       "user_email": "<USER-EMAIL>",
-       "user_name": "<USER-NAME>"
-     }
-     ```
-
-3. **GET /api/user**: Get user profile (protected).
-   - **Headers**: `Authorization: Bearer <JWT-TOKEN>`
-   - **Response**:
-     ```json
-     {
-       "userId": "<USER-ID>",
-       "fullName": "John Doe",
-       "email": "johndoe@example.com"
-     }
-     ```
+1. **POST /api/register** - Register a new user.
+2. **POST /api/login** - User login with JWT authentication.
+3. **GET /api/user** - Get user profile (protected).
+4. **PUT /api/updateUser/:id** - Update user profile (with file upload).
+5. **GET /api/userImage/:id** - Retrieve user profile image.
+6. **GET /api/getConnections** - Fetch all user connections.
 
 ### **Post Management:**
+1. **POST /api/posts/create** - Create a new post (with file upload).
+2. **GET /api/posts/:id** - Retrieve a post by ID.
+3. **GET /api/posts/image/:id** - Get image of a post by its ID.
+4. **GET /api/posts** - Fetch all posts (protected).
+5. **PUT /api/posts/:id** - Update a post (with file upload).
+6. **DELETE /api/posts/:id** - Delete a post.
 
-1. **POST /api/posts/create**: Create a new post.
-   - **Request body** (multipart/form-data):
-     ```json
-     {
-       "title": "Post Title",
-       "description": "This is a description of the post",
-       "userId": "<USER-ID>",
-       "userEmail": "<USER-EMAIL>",
-       "userName": "<USER-NAME>",
-       "file": "<file>"
-     }
-     ```
-   - **Response**: 
-     ```json
-     {
-       "message": "Post created successfully!"
-     }
-     ```
-
-2. **GET /api/posts/:id**: Get a post by ID.
-   - **Response**:
-     ```json
-     {
-       "_id": "<POST-ID>",
-       "title": "Post Title",
-       "description": "Post Description",
-       "image_file": "<BASE64-ENCODED-IMAGE>",
-       "userId": "<USER-ID>",
-       "userName": "John Doe",
-       "updatedAt": "2024-01-01T12:00:00Z"
-     }
-     ```
-
-3. **GET /api/posts**: Get all posts.
-   - **Response**:
-     ```json
-     [
-       {
-         "_id": "<POST-ID>",
-         "title": "Post Title",
-         "description": "Post Description",
-         "userId": "<USER-ID>",
-         "userName": "John Doe",
-         "image_file": "<BASE64-ENCODED-IMAGE>"
-       }
-     ]
-     ```
-
-4. **PUT /api/posts/:id**: Update a post by ID.
-   - **Request body** (multipart/form-data):
-     ```json
-     {
-       "title": "Updated Title",
-       "description": "Updated description",
-       "userEmail": "updatedemail@example.com",
-       "userName": "Updated User",
-       "file": "<new-file>"
-     }
-     ```
-   - **Response**: 
-     ```json
-     {
-       "message": "Post updated successfully!"
-     }
-     ```
-
-5. **DELETE /api/posts/:id**: Delete a post by ID.
-   - **Response**:
-     ```json
-     {
-       "message": "Post deleted successfully"
-     }
-     ```
-
-6. **GET /api/posts/image/:id**: Get the image of a post by its ID (if image is stored in MongoDB).
-   - **Response**: Returns the image data in the original content type.
-
-
+### **Friend Requests & Connections:**
+1. **POST /api/friends/send** - Send a friend request.
+2. **POST /api/friends/accept** - Accept a friend request.
+3. **POST /api/friends/reject** - Reject a friend request.
+4. **GET /api/friends/pending-requests** - Fetch pending friend requests.
+5. **GET /api/friends/sent-requests** - Fetch sent friend requests.
+6. **GET /api/friends/accepted-requests** - Fetch accepted friend requests.
+7. **GET /api/friends/available-users** - Fetch users available for connection.
+8. **GET /api/friends/all-connections** - Get all accepted connections.
+9. **POST /api/friends/remove-connection** - Remove a friend connection.
