@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const logger = require("../logger");
 const {
   sendFriendRequest,
   acceptFriendRequest,
@@ -13,6 +14,13 @@ const {
 } = require("../controllers/connectionController");
 
 const authenticateToken = require("../middleware/authenticateToken");
+
+const logRequest = (req, res, next) => {
+  logger.info(`${req.method} ${req.originalUrl}`);
+  next();
+};
+
+router.use(logRequest);
 
 router.post("/send", authenticateToken, sendFriendRequest);
 router.post("/accept", authenticateToken, acceptFriendRequest);

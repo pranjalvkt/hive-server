@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
-const logger = require('../logger');  // Import logger
+const logger = require('../logger');
 const fs = require("fs");
 const path = require("path");
 

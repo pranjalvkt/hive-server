@@ -11,11 +11,11 @@ connectDB();
 dotenv.config();
 
 const app = express();
-const port = 3001;
+const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = [
-    'http://localhost:3001',
-    'http://localhost:3000'
+  'http://localhost:3001',
+  'http://localhost:3000'
 ];
 
 const corsOptions = {
@@ -36,6 +36,6 @@ app.use('/api', userRoutes);
 app.use('/api/posts', postRoutes); 
 app.use('/api/connections', connectionRoutes);
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
