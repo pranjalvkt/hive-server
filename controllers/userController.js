@@ -101,7 +101,7 @@ const getUser = async (req, res) => {
     const user = await User.findById(id).select("-password");
     if (!user) {
       logger.warn(`User not found: ${id}`);
-      return res.status(404).json({ message: "User not found" });
+      return res.status(200).json({ message: "User not found" });
     }
 
     logger.info(`User data fetched successfully: ${id}`);
@@ -112,20 +112,39 @@ const getUser = async (req, res) => {
   }
 };
 
-const getConnections = async (req, res) => {
+const searchUsers = async (req, res) => {
+  const { q } = req.query;
   const { id } = req.params;
   
-    try {
-      const response = await User.findById(id, { connections: 1, _id: 0 })
-      .populate("connections", "fullName email profilePic")
-      const friendsList = response?.connections || []
-      logger.info(`All Users fetched successfully`);
-      res.status(200).json(friendsList);
-    } catch (error) {
-      logger.error(`Error fetching users`);
-      res.status(500).json({ message: "Server error", error: err.message });
+  if (!q) {
+    logger.warn("Search query is empty");
+    return res.status(400).json({ message: "Search query cannot be empty." });
+  }
+
+  try {
+    const users = await User.find({ 
+      fullName: { $regex: q, $options: "i" },
+      _id: { $ne: id }
+    }).select("-password");
+
+    if (users.length === 0) {
+      logger.info(`No users found matching query: ${q}`);
+      return res.status(200).json({ message: "No users found." });
     }
-}
+    const userResults = users.map(user => ({
+      _id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      profilePic: user?.profilePic
+    }));
+
+    logger.info(`Found ${users.length} users matching query: ${q}`);
+    res.status(200).json(userResults);
+  } catch (err) {
+    logger.error(`Error searching users: ${err.message}`);
+    res.status(500).json({ message: "Server error." });
+  }
+};
 
 const getImageByUserId = async (req, res) => {
   const { id } = req.params;
@@ -135,7 +154,7 @@ const getImageByUserId = async (req, res) => {
 
     if (!user) {
       logger.warn(`User profile picture not found: ${id}`);
-      return res.status(404).json({ message: "Profile picture not found" });
+      return res.status(200).json({ message: "Profile picture not found" });
     }
 
     res.contentType(user?.profilePic?.contentType);
@@ -148,4 +167,4 @@ const getImageByUserId = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getUser, updateUser, getImageByUserId, getConnections };
+module.exports = { register, login, getUser, updateUser, getImageByUserId, searchUsers };
