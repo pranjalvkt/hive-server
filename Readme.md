@@ -29,7 +29,7 @@ Hive is a social media platform's backend API, providing user authentication, pr
 3. **GET /api/user** - Get user profile (protected).
 4. **PUT /api/updateUser/:id** - Update user profile (with file upload).
 5. **GET /api/userImage/:id** - Retrieve user profile image.
-6. **GET /api/getConnections** - Fetch all user connections.
+6. **GET /api/search?q=** - Search for users
 
 ### **Post Management:**
 1. **POST /api/posts/create** - Create a new post (with file upload).
