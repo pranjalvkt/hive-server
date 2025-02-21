@@ -17,7 +17,7 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:3000',
   'https://connectinhive.netlify.app',
-  'https://chatinhive.netlify.app/'
+  'https://chatinhive.netlify.app'
 ];
 
 const corsOptions = {
