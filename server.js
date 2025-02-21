@@ -15,7 +15,9 @@ const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = [
   'http://localhost:3001',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'https://connectinhive.netlify.app',
+  'https://chatinhive.netlify.app'
 ];
 
 const corsOptions = {
@@ -23,7 +25,7 @@ const corsOptions = {
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {
-        callback(new Error('CORS not allowed for this origin'));
+        callback(new Error('CORS not allowed for this origin', origin));
       }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
