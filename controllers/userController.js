@@ -29,7 +29,6 @@ const register = async (req, res) => {
     
 
     await newUser.save();
-    logger.info(`User registered successfully: ${email}`);
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     logger.error(`Error registering user: ${err.message}`);
@@ -44,7 +43,7 @@ const updateUser = async (req, res) => {
   try {
     const user = await User.findById(id).select("-password");
     if (!user) {
-      logger.warn(`User not found for update: ${id}`);
+      logger.warn(`User not found for update`);
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -58,7 +57,6 @@ const updateUser = async (req, res) => {
     }
 
     const updatedUser = await user.save();
-    logger.info(`User updated successfully: ${id}`);
     res.status(200).json({
       message: 'Post updated successfully',
       user: { user_id: updatedUser._id, user_email: updatedUser.email, user_name: updatedUser.fullName, profilePic: updatedUser.profilePic },
@@ -86,7 +84,6 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
-    logger.info(`User logged in successfully: ${email}`);
     res.status(200).json({ token: token, user_id: user._id, user_email: user.email, user_name: user.fullName });
   } catch (err) {
     logger.error(`Error during login: ${err.message}`);
@@ -100,11 +97,9 @@ const getUser = async (req, res) => {
   try {
     const user = await User.findById(id).select("-password");
     if (!user) {
-      logger.warn(`User not found: ${id}`);
+      logger.warn(`User not found`);
       return res.status(200).json({ message: "User not found" });
     }
-
-    logger.info(`User data fetched successfully: ${id}`);
     res.status(200).json({ user_id: user._id, user_email: user.email, user_name: user.fullName, profilePic: user?.profilePic });
   } catch (err) {
     logger.error(`Error fetching user: ${err.message}`);
@@ -138,7 +133,6 @@ const searchUsers = async (req, res) => {
       profilePic: user?.profilePic
     }));
 
-    logger.info(`Found ${users.length} users matching query: ${q}`);
     res.status(200).json(userResults);
   } catch (err) {
     logger.error(`Error searching users: ${err.message}`);
@@ -153,18 +147,36 @@ const getImageByUserId = async (req, res) => {
     const user = await User.findById(id);
 
     if (!user) {
-      logger.warn(`User profile picture not found: ${id}`);
+      logger.warn(`User profile picture not found`);
       return res.status(200).json({ message: "Profile picture not found" });
     }
 
     res.contentType(user?.profilePic?.contentType);
     res.send(user?.profilePic?.data);
-
-    logger.info(`User profile picture sent successfully: ${id}`);
   } catch (err) {
     logger.error(`Error retrieving image for user ${id}: ${err.message}`);
     res.status(500).json({ message: "Error retrieving image", error: err.message });
   }
 };
 
-module.exports = { register, login, getUser, updateUser, getImageByUserId, searchUsers };
+const getUserDetailsForMessage = async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const user = await User.findById(id).select('-password');
+    if (!user) {
+      logger.warn('User not found');
+      return res.status(200).json({ message: 'User not found' });
+    }
+    res.status(200).json({
+      user_id: user._id,
+      user_name: user.fullName,
+      profilePic: user?.profilePic,
+    });
+  } catch (err) {
+    logger.error(`Error fetching user: ${err.message}`);
+    res.status(500).json({ message: 'Server error.' });
+  }
+};
+
+module.exports = { register, login, getUser, updateUser, getImageByUserId, searchUsers, getUserDetailsForMessage };

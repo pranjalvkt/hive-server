@@ -8,9 +8,9 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 const logRequest = (req, res, next) => {
-    logger.info(`${req.method} ${req.originalUrl}`);
-    next();
-  };
+  logger.info(`${req.method} ${req.originalUrl}`);
+  next();
+};
   
 router.use(logRequest);
 
