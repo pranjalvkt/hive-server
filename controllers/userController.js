@@ -58,7 +58,7 @@ const updateUser = async (req, res) => {
 
     const updatedUser = await user.save();
     res.status(200).json({
-      message: 'Post updated successfully',
+      message: 'User deatils updated successfully',
       user: { user_id: updatedUser._id, user_email: updatedUser.email, user_name: updatedUser.fullName, profilePic: updatedUser.profilePic },
     });
   } catch (err) {
@@ -159,7 +159,7 @@ const getImageByUserId = async (req, res) => {
   }
 };
 
-const getUserDetailsForMessage = async (req, res) => {
+const getUserDetails = async (req, res) => {
   const { id } = req.params;
   
   try {
@@ -172,6 +172,7 @@ const getUserDetailsForMessage = async (req, res) => {
       user_id: user._id,
       user_name: user.fullName,
       profilePic: user?.profilePic,
+      user_email: user?.email,
     });
   } catch (err) {
     logger.error(`Error fetching user: ${err.message}`);
@@ -179,4 +180,4 @@ const getUserDetailsForMessage = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getUser, updateUser, getImageByUserId, searchUsers, getUserDetailsForMessage };
+module.exports = { register, login, getUser, updateUser, getImageByUserId, searchUsers, getUserDetails };
