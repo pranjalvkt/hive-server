@@ -7,7 +7,7 @@ const {
     updateUser, 
     getImageByUserId, 
     searchUsers,
-    getUserDetailsForMessage
+    getUserDetails,
 } = require('../controllers/userController');
 const authenticateToken = require('../middleware/authenticateToken'); 
 const validateIdParam = require("../middleware/validateIdParam");
@@ -29,5 +29,5 @@ router.get('/user', authenticateToken, getUser);
 router.put("/updateUser/:id", upload.single('file'), updateUser);
 router.get('/userImage/:id', validateIdParam, getImageByUserId);
 router.get('/search', authenticateToken, searchUsers);
-router.get('/getUserDetails/:id', getUserDetailsForMessage);
+router.get('/getUserDetails/:id', getUserDetails);
 module.exports = router;
